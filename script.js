@@ -22,11 +22,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
         //Scales.
         const xScale = d3.scaleLinear().domain([yearMin-1, yearMax]).range([0+padding, width-padding]);
-        const yScale = d3.scaleLinear().domain([timeMax, timeMin-5]).range([height-padding, 0+padding]);
+        const yScale = d3.scaleLinear().domain([timeMax+5, timeMin-5]).range([height-padding, 0+padding]);
 
         //X and Y Axis constants, used when the axes are called later in the program.
-        const xAxis = d3.axisBottom(xScale);
-        const yAxis = d3.axisLeft(yScale);
+        const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
+        const yAxis = d3.axisLeft(yScale).tickFormat((d) => {
+            return d%60 < 10 ? `${Math.floor(d/60)}:0${d%60}`: `${Math.floor(d/60)}:${d%60}`;
+        });
 
         //The dot elements in the graph.
         svg.selectAll("circle")
@@ -35,8 +37,10 @@ document.addEventListener("DOMContentLoaded", function() {
         .append("circle")
         .attr("cx", (d) => xScale(d["Year"]))
         .attr("cy", (d) => yScale(d["Seconds"]))
-        .attr("r", 5)
-        .attr("fill", (d) => d["Doping"] === "" ? "orange" : "navy");
+        .attr("r", 7)
+        .attr("fill", (d) => d["Doping"] === "" ? "orange" : "navy")
+        .attr("stroke", "black")
+        .attr("stroke-width", "2");
 
         //X Axis.
         svg.append("g")
@@ -47,6 +51,21 @@ document.addEventListener("DOMContentLoaded", function() {
         svg.append("g")
         .attr("transform", "translate(" + (padding) +", 0)")
         .call(yAxis);
+
+        //Chart title & Subtitle.
+        svg.append("text")
+        .attr("x", width/2)
+        .attr("y", 20)
+        .attr("text-anchor", "middle")
+        .attr("class", "title")
+        .text("Doping in Professional Bicycle Racing");
+
+        svg.append("text")
+        .attr("x", width/2)
+        .attr("y", 45)
+        .attr("text-anchor", "middle")
+        .attr("class", "subtitle")
+        .text("35 Fastest Times Up Alpe d'Huez");
 
         //Only used for testing, delete later.
         document.getElementById("content").innerHTML = timeMax;
