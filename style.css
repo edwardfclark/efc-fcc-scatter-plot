@@ -1,3 +1,9 @@
+svg {
+    display: block;
+    margin: 0 auto;
+    margin-top: 100px;
+}
+
 .title {
     font-size: 25px;
 }
@@ -5,8 +11,6 @@
 div.tooltip {	
     position: absolute;			
     text-align: left;			
-    					
-    					
     padding: 0 10px;				
     font: 12px sans-serif;		
     background: lightsteelblue;	
@@ -14,3 +18,4 @@ div.tooltip {
     border-radius: 8px;			
     pointer-events: none;			
 }
+

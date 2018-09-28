@@ -61,7 +61,8 @@ document.addEventListener("DOMContentLoaded", function() {
             div.transition().duration(200).style("opacity", .9);
             div.html(generateTooltip(d))
             .style("left", (d3.event.pageX+10)+"px")
-            .style("top", (d3.event.pageY - 28)+"px");
+            .style("top", (d3.event.pageY - 28)+"px")
+            .attr("data-year", d["Year"]);
         })
         .on("mouseout", (d) => {
             div.transition().duration(500).style("opacity", 0);
@@ -96,7 +97,8 @@ document.addEventListener("DOMContentLoaded", function() {
         .attr("class", "subtitle")
         .text("35 Fastest Times Up Alpe d'Huez");
 
-        //Legend. First, create the legend group, then append the text and rects to it.
+        //Legend. 
+        //First, create the legend group, then append the text and rects to it.
 
         svg.append("g").attr("id", "legend");
 
@@ -124,8 +126,6 @@ document.addEventListener("DOMContentLoaded", function() {
         .attr("y", 240)
         .text("Riders without doping ellegations");
 
-        //Only used for testing, delete later.
-        document.getElementById("content").innerHTML = JSON.stringify(dataset[0]);
     }
 
     
