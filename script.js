@@ -1,3 +1,13 @@
+function generateTooltip(d) {
+    let html = "<p>";
+
+    html += d["Name"]+": "+d["Nationality"]+"<br/>";
+    html += "Year: "+d["Year"]+", Time: "+d["Time"];
+    d["Doping"] === "" ? html = html : html+="<br/><br/>"+d["Doping"];
+    html+="</p>";
+    return html;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 
     let request = new XMLHttpRequest();
@@ -30,6 +40,9 @@ document.addEventListener("DOMContentLoaded", function() {
             return d%60 < 10 ? `${Math.floor(d/60)}:0${d%60}`: `${Math.floor(d/60)}:${d%60}`;
         });
 
+        //Tooltip appended to body.
+        const div = d3.select("body").append("div").attr("class", "tooltip").attr("id", "tooltip").style("opacity", 0);
+
         //The dot elements in the graph.
         svg.selectAll("circle")
         .data(dataset)
@@ -37,23 +50,38 @@ document.addEventListener("DOMContentLoaded", function() {
         .append("circle")
         .attr("cx", (d) => xScale(d["Year"]))
         .attr("cy", (d) => yScale(d["Seconds"]))
+        .attr("data-xvalue", (d) => d["Year"])
+        .attr("data-yvalue", (d) => d["Seconds"])
         .attr("r", 7)
         .attr("fill", (d) => d["Doping"] === "" ? "orange" : "navy")
         .attr("stroke", "black")
-        .attr("stroke-width", "2");
+        .attr("stroke-width", "2")
+        //Tooltip is made visible on mouseover.
+        .on("mouseover", (d) => {
+            div.transition().duration(200).style("opacity", .9);
+            div.html(generateTooltip(d))
+            .style("left", (d3.event.pageX+10)+"px")
+            .style("top", (d3.event.pageY - 28)+"px");
+        })
+        .on("mouseout", (d) => {
+            div.transition().duration(500).style("opacity", 0);
+        });
 
         //X Axis.
         svg.append("g")
         .attr("transform", "translate(0," + (height - padding) + ")")
+        .attr("id", "x-axis")
         .call(xAxis);
 
         //Y Axis.
         svg.append("g")
         .attr("transform", "translate(" + (padding) +", 0)")
+        .attr("id", "y-axis")
         .call(yAxis);
 
         //Chart title & Subtitle.
         svg.append("text")
+        .attr("id", "title")
         .attr("x", width/2)
         .attr("y", 20)
         .attr("text-anchor", "middle")
@@ -61,14 +89,43 @@ document.addEventListener("DOMContentLoaded", function() {
         .text("Doping in Professional Bicycle Racing");
 
         svg.append("text")
+        .attr("id", "subtitle")
         .attr("x", width/2)
         .attr("y", 45)
         .attr("text-anchor", "middle")
         .attr("class", "subtitle")
         .text("35 Fastest Times Up Alpe d'Huez");
 
+        //Legend. First, create the legend group, then append the text and rects to it.
+
+        svg.append("g").attr("id", "legend");
+
+        d3.select("#legend").append("rect")
+        .attr("x", width-padding-20)
+        .attr("y", 200)
+        .attr("fill", "navy")
+        .attr("width", 20)
+        .attr("height", 20);
+
+        d3.select("#legend").append("rect")
+        .attr("x", width-padding-20)
+        .attr("y", 225)
+        .attr("fill", "orange")
+        .attr("width", 20)
+        .attr("height", 20);
+
+        d3.select("#legend").append("text")
+        .attr("x", width-padding-220)
+        .attr("y", 215)
+        .text("Riders with doping allegations");
+
+        d3.select("#legend").append("text")
+        .attr("x", width-padding-240)
+        .attr("y", 240)
+        .text("Riders without doping ellegations");
+
         //Only used for testing, delete later.
-        document.getElementById("content").innerHTML = timeMax;
+        document.getElementById("content").innerHTML = JSON.stringify(dataset[0]);
     }
 
     
